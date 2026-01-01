@@ -1,3 +1,5 @@
 discord.py
 python-jobspy
 pandas
+beautifulsoup4
+requests
