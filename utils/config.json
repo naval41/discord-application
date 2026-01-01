@@ -1,0 +1,30 @@
+{
+    "discord_token": "TEST_TOKEN",
+    "channel_id": 1455048396439294014,
+    "search_terms": [
+        "Python Developer",
+        "Django Developer",
+        "Software Engineer",
+        "Software Developer",
+        "Full Stack Developer",
+        "Data Scientist",
+        "Data Engineer",
+        "Machine Learning Engineer"
+    ],
+    "locations": [
+        "USA",
+        "Canada",
+        "UK",
+        "India",
+        "Remote"
+    ],
+    "sites": [
+        "linkedin",
+        "zip_recruiter",
+        "glassdoor",
+        "google",
+        "bayt",
+        "ycombinator"
+    ],
+    "scrape_interval_hours": 6
+}
