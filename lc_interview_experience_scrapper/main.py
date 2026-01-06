@@ -75,11 +75,12 @@ def run_scraper():
             post_url = f"https://leetcode.com/discuss/post/{topic_id}/"
             full_content = lc_client.fetch_post_content(post_url)
             
-            content_to_use = full_content if full_content else summary
-            if full_content:
-                print(f"  - Scraped full content url : {post_url} ({len(full_content)} chars)")
-            else:
-                print(f"  - Failed to scrape content, using summary ({len(summary)} chars)")
+            if not full_content:
+                print(f"  - Failed to scrape content from {post_url}. SKIPPING.")
+                continue
+            
+            content_to_use = full_content
+            print(f"  - Scraped full content url : {post_url} ({len(full_content)} chars)")
 
             # 4. Step 1: Check Interview & Extract Company
             company_info = bedrock.extract_company_info(title, content_to_use)

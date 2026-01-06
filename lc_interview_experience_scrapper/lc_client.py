@@ -91,28 +91,48 @@ class LeetCodeClient:
             return None
 
     def fetch_post_content(self, url):
-        try:
-            time.sleep(2) # Politeness delay
-            # Minimal headers for HTML scraping
-            headers = {
-                "User-Agent": self.session.headers["User-Agent"]
-            }
-            
-            response = self.session.get(url, headers=headers)
-            
-            if response.status_code != 200:
-                print(f"Error scraping post content from {url}: Status {response.status_code}")
-                return ""
-            
-            soup = BeautifulSoup(response.text, 'html.parser')
-            # Class provided by user
-            content_div = soup.find('div', class_="relative mt-4 flex w-full flex-none flex-col overflow-auto px-4 pb-8 gap-4")
-            
-            if content_div:
-                return content_div.get_text(separator="\n", strip=True)
-            else:
-                print(f"Warning: Content div not found for {url}")
-                return ""
-        except Exception as e:
-            print(f"Error scraping post content from {url}: {e}")
-            return ""
+        # List of profiles to try in case of 403
+        profiles = ["chrome_120", "firefox_120", "safari_16_0", "opera_90"]
+        
+        for profile in profiles:
+            try:
+                time.sleep(2) # Politeness delay
+                
+                # Create a temporary session for this request to try specific profile
+                temp_session = tls_client.Session(
+                    client_identifier=profile,
+                    random_tls_extension_order=True
+                )
+                headers = {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    "Accept-Language": "en-US,en;q=0.9",
+                    "Referer": "https://leetcode.com/discuss/interview-experience?currentPage=1&orderBy=hot&query=",
+                }
+                
+                if "safari" in profile:
+                     headers["User-Agent"] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15"
+
+                response = temp_session.get(url, headers=headers)
+                
+                if response.status_code == 200:
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    content_div = soup.find('div', class_="relative mt-4 flex w-full flex-none flex-col overflow-auto px-4 pb-8 gap-4")
+                    
+                    if content_div:
+                        return content_div.get_text(separator="\n", strip=True)
+                    else:
+                        print(f"Warning: Content div not found for {url}")
+                        return ""
+                elif response.status_code == 403:
+                    print(f"  - 403 Forbidden with {profile}. Retrying with next profile...")
+                    continue
+                else:
+                    print(f"Error scraping post content from {url}: Status {response.status_code}")
+                    return ""
+
+            except Exception as e:
+                print(f"Error scraping post content from {url} with {profile}: {e}")
+                continue
+        
+        print(f"Failed to scrape {url} after trying all profiles.")
+        return ""
