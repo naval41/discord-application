@@ -113,6 +113,24 @@ def run_scraper():
                 # Let's NOT mark visited so we can retry if it's transient.
                 continue
                 
+            # --- CONFIDENCE CHECK ---
+            confidence_score = extraction.get("confidence_score", 0)
+            confidence_reasoning = extraction.get("confidence_reasoning", "No reasoning provided.")
+            interview_rounds = extraction.get("interview_rounds", [])
+            
+            print(f"  - Extraction Score: {confidence_score}/100. Reasoning: {confidence_reasoning}")
+
+            if confidence_score < 70:
+                print(f"  - SKIPPING: Low Confidence Score ({confidence_score}%).")
+                mark_leetcode_post_visited(uuid)
+                continue
+
+            if not interview_rounds:
+                print(f"  - SKIPPING: No interview rounds found.")
+                mark_leetcode_post_visited(uuid)
+                continue
+            # ------------------------
+                
             try:
                 # Resolve Job Role ID
                 job_role_id = extraction.get("job_role_id")

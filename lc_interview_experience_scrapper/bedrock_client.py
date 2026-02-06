@@ -80,6 +80,14 @@ class BedrockProcessor:
                                 "type": "number",
                                 "description": "Rating out of 5"
                             },
+                            "confidence_score": {
+                                "type": "integer",
+                                "description": "Confidence score 0-100 indicating the quality and completeness of this interview experience."
+                            },
+                            "confidence_reasoning": {
+                                "type": "string",
+                                "description": "Reasoning for the given confidence score."
+                            },
                             "is_anonymous": {
                                 "type": "boolean",
                                 "description": "Is user anonymous"
@@ -119,7 +127,8 @@ class BedrockProcessor:
                             }
                         },
                         "required": [
-                           "job_role_id"
+                           "job_role_id",
+                           "confidence_score"
                         ]
                     }
                 }
@@ -169,7 +178,15 @@ class BedrockProcessor:
             "content tag contains json format content. All answers write as point of candidate experience and not as third person."
             "In interview experience, please keep format intact like HTML tags and rich text, replace these with the markdown tags."
             "Also when you are not able to get the value then put that field empty instead of having <UNKNOWN>."
-            "Also current interview experience is lacking information around level, if you are able to guess based on the interview experience and from the title.")
+            "Also current interview experience is lacking information around level, if you are able to guess based on the interview experience and from the title."
+            "\n\nCONFIDENCE SCORE INSTRUCTIONS:\n"
+            "Analyze the quality of this interview experience and assign a 'confidence_score' (0-100).\n"
+            "- High Score (>80): Detailed description of rounds, clear questions asked, good structure.\n"
+            "- Medium Score (50-79): Some details, but missing specific questions or very brief.\n"
+            "- Low Score (<50): Extremely vague, one-liners, no meaningful details, or just 'I got rejected/accepted' without process details.\n"
+            "- ZERO ROUNDS: If the post does not describe any specific interview rounds/questions, score MUST be below 40.\n"
+            "Provide 'confidence_reasoning' explaining your score."
+            )
         
 
         try:
